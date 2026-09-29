@@ -1,56 +1,68 @@
-# Welcome to your Expo app 👋
+# Rotina Acadêmica 📚
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**Rotina Acadêmica** é um aplicativo mobile desenvolvido com React Native e Expo como trabalho acadêmico da disciplina **"Tópicos Especiais em Sistemas de Informação"**, do curso de Sistemas de Informação.
 
-## Get started
+O objetivo do projeto é colocar em prática conceitos de desenvolvimento mobile — construção de telas, estilização e navegação entre telas — criando um aplicativo que ajude estudantes a organizar sua rotina acadêmica.
 
-1. Install dependencies
+## Status atual
+
+O projeto está sendo desenvolvido de forma incremental, acompanhando as aulas da disciplina. Atualmente ele conta com:
+
+- **Tela inicial** (`src/app/index.tsx`): tela de boas-vindas com botão de login.
+- **Tela de credenciais** (`src/app/two-screen.tsx`): tela para inserir as credenciais, com botão para voltar.
+- **Navegação em pilha** (`src/app/_layout.tsx`): navegação entre as telas usando o Expo Router.
+
+## Tecnologias
+
+- [React Native](https://reactnative.dev/) — desenvolvimento mobile multiplataforma
+- [Expo](https://expo.dev/) (SDK 57) — plataforma e ferramentas de desenvolvimento
+- [Expo Router](https://docs.expo.dev/router/introduction/) — roteamento baseado em arquivos e navegação
+- [TypeScript](https://www.typescriptlang.org/) — tipagem estática
+- [Visual Studio Code](https://code.visualstudio.com/) — editor de código
+
+## Estrutura do projeto
+
+```
+src/
+└── app/
+    ├── _layout.tsx     # Layout raiz (navegação em pilha)
+    ├── index.tsx       # Tela inicial
+    └── two-screen.tsx  # Tela de credenciais
+```
+
+## Como executar
+
+### Pré-requisitos
+
+- [Node.js](https://nodejs.org/) (versão LTS)
+- [Expo Go](https://expo.dev/go) no celular, ou um emulador Android / simulador iOS
+
+### Rodando o projeto
+
+1. Instale as dependências
 
    ```bash
    npm install
    ```
 
-2. Start the app
+2. Inicie o servidor de desenvolvimento
 
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+3. Escaneie o QR code com o Expo Go (Android) ou com a câmera (iOS), ou pressione `a` / `i` / `w` no terminal para abrir no Android, iOS ou navegador.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### Scripts disponíveis
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+| Comando           | Descrição                                   |
+| ----------------- | ------------------------------------------- |
+| `npm start`       | Inicia o servidor de desenvolvimento do Expo |
+| `npm run android` | Abre o app no Android                       |
+| `npm run ios`     | Abre o app no iOS                           |
+| `npm run web`     | Abre o app no navegador                     |
+| `npm run lint`    | Executa o linter                            |
 
-## Get a fresh project
+## Autor
 
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-### Other setup steps
-
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Desenvolvido por **Vitor Batista** como parte da disciplina *Tópicos Especiais em Sistemas de Informação*.
