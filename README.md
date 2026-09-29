@@ -1,4 +1,4 @@
-# Rotina Acadêmica 📚
+#App de Rotina Acadêmica 📚
 
 **Rotina Acadêmica** é um aplicativo mobile desenvolvido com React Native e Expo como trabalho acadêmico da disciplina **"Tópicos Especiais em Sistemas de Informação"**, do curso de Sistemas de Informação.
 
