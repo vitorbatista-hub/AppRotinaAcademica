@@ -4,7 +4,7 @@ export default function RootLayout() {
     return (
         <Stack>
             <Stack.Screen name="index"/>
-            <Stack.Screen name="two-screm"/>
+            <Stack.Screen name="two-screen"/>
         </Stack>
     )
 }

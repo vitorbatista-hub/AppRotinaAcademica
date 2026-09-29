@@ -9,7 +9,7 @@ export default function Index() {
             <Button
                 title="Fazer login"
                 onPress={() => {
-                    router.push("/two-screm");
+                    router.push("/two-screen");
                 }}
             />
         
