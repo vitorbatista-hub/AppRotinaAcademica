@@ -1,6 +1,8 @@
 import { router } from "expo-router";
 import { Button, Platform, StyleSheet, Text, View } from "react-native";
 
+import { fontFamily } from "@/styles/fontFamily"
+
 export default function Index() {
     return (
         <View style={styles.container}>
@@ -27,12 +29,13 @@ const styles = StyleSheet.create({
 
     title: {
         fontSize: 20,
-        fontWeight: "700",
+        fontFamily: fontFamily.semiBold ,
         color: "#050505",
     },
     
     subtitle: {
         fontSize: 16,
+        fontFamily: fontFamily.regular,
         color: "#353636",
     },
 
