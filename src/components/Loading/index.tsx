@@ -1,8 +1,9 @@
+import { colors } from "@/styles/colors";
 import { ActivityIndicator } from "react-native";
 
 
 export function Loading() {
     return (
-        <ActivityIndicator size={"small"} color={"red"} />
+        <ActivityIndicator size={"small"} color={colors.primary} />
     )
 }
