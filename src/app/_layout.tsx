@@ -26,7 +26,7 @@ export default function RootLayout() {
                 alignItems: "center"
                 }}>
 
-                <Loading />
+                <Loading/>
             </View>
         )
     }
@@ -36,7 +36,7 @@ export default function RootLayout() {
             headerShown: false,
         }}>
             <Stack.Screen name="index"/>
-            <Stack.Screen name="two-screen"/>
+            <Stack.Screen name="(tabs)"/>
         </Stack>
     )
 }
