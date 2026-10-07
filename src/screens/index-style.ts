@@ -38,4 +38,14 @@ export const styles = StyleSheet.create({
         color: colors.text.secondary,
     },
 
+    cardContent: {
+        flexDirection: "row",
+        gap: 16,
+        paddingTop: 16,
+    },
+
+    card: {
+        flex: 1,
+    },
+
 });
