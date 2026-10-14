@@ -1,63 +1,126 @@
+import { DisciplineInfoCard } from "@/components/DisciplineInfoCard";
+import { Header } from "@/components/Header";
 import { SummaryCard } from "@/components/SummaryCard";
-import { styles } from "@/screens/index-style";
+import { UpcomingActivityCard } from "@/components/UpcomingActivityCard";
+import { useActivities } from "@/contexts/ActivitiesContext";
+import { useDisciplines } from "@/contexts/DisciplinesContext";
+import { Activity, ActivityDetail } from "@/data/activities";
+import { summary } from "@/data/summary";
+import { styles } from "@/screens/Home/styles";
 import { colors } from "@/styles/colors";
+import { daysUntil, parseIsoDate } from "@/utils/date";
 import { FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Text, View } from "react-native";
+import { Link } from "expo-router";
+import { ScrollView, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+const SUMMARY_ICON_SIZE = 20;
+const HOME_ACTIVITIES_LIMIT = 2;
+const HOME_DISCIPLINES_LIMIT = 2;
+
+// Converte a atividade do banco para o formato resumido do card da Home.
+function toUpcomingActivity(activity: ActivityDetail): Activity {
+    const days = daysUntil(parseIsoDate(activity.dueDate));
+    const isWarning = activity.status === "urgent" || days <= 0;
+
+    return {
+        id: activity.id,
+        title: activity.title,
+        discipline: activity.discipline,
+        badge: isWarning ? "Pendente" : `Em ${days} ${days === 1 ? "dia" : "dias"}`,
+        dueLabel: activity.dueLabel,
+        tone: isWarning ? "warning" : "neutral",
+    };
+}
 
 export default function Index() {
+    const { activities, pendingCount } = useActivities();
+    const { disciplines } = useDisciplines();
+
+    // A lista já vem do banco ordenada pela data de entrega.
+    const upcomingActivities = activities
+        .filter((activity) => activity.status !== "done")
+        .slice(0, HOME_ACTIVITIES_LIMIT)
+        .map(toUpcomingActivity);
+
     return (
-        <View style={styles.container}>
-            <View style={styles.content}>
-                <Text style={styles.label}>Minha Rotina</Text>
+        <SafeAreaView style={styles.container} edges={["top"]}>
+            <Header hasNotifications={summary.hasNotifications} />
+
+            <ScrollView contentContainerStyle={styles.content}
+                showsVerticalScrollIndicator={false}
+            >
                 <View style={styles.titleContent}>
                     <Text style={styles.title}>Olá, estudante!</Text>
                     <Text style={styles.subtitle}>Organize sua rotina acadêmica</Text>
                 </View>
-                
-                <SummaryCard total={5}
-                    title="Pendências"
-                    subtitle="Para esta semana"
-                    textColor={colors.orange}
-                    icon={
-                    <MaterialCommunityIcons name="clipboard-alert"
-                        color={colors.orange}
-                        size={26} />
-                    }
-                />
 
-                <View style={styles.cardContent}>
-                    <View style={styles.card}>
-                        <SummaryCard total={2}
-                            title="Provas"
-                            subtitle="Próximos 15 dias"
-                            textColor={colors.red}
-                            icon={
-                            <FontAwesome6 name="clipboard-question"
-                                color={colors.red}
-                                size={26} />
-                            }
-                        />
+                <View style={styles.summary}>
+                    <SummaryCard total={pendingCount}
+                        title="Pendências"
+                        subtitle="Para esta semana"
+                        textColor={colors.orange}
+                        accentColor={colors.background.red}
+                        icon={
+                            <MaterialCommunityIcons name="clipboard-alert"
+                                color={colors.orange}
+                                size={SUMMARY_ICON_SIZE} />
+                        }
+                    />
 
+                    <View style={styles.cardContent}>
+                        <View style={styles.card}>
+                            <SummaryCard total={summary.exams}
+                                title="Provas"
+                                subtitle="Próximos 15 dias"
+                                textColor={colors.red}
+                                accentColor={colors.background.error}
+                                icon={
+                                    <FontAwesome6 name="clipboard-question"
+                                        color={colors.red}
+                                        size={SUMMARY_ICON_SIZE} />
+                                }
+                            />
+                        </View>
+
+                        <View style={styles.card}>
+                            <SummaryCard total={disciplines.length}
+                                title="Disciplinas"
+                                subtitle="Ativas no semestre"
+                                textColor={colors.primary}
+                                accentColor={colors.info}
+                                accentOpacity={0.1}
+                                icon={
+                                    <FontAwesome6 name="graduation-cap"
+                                        color={colors.primary}
+                                        size={SUMMARY_ICON_SIZE} />
+                                }
+                            />
+                        </View>
                     </View>
-
-                    <View style={styles.card}>
-                        <SummaryCard total={5}
-                            title="Disciplinas"
-                            subtitle="Ativas no semestre"
-                            textColor={colors.primary}
-                            icon={
-                            <FontAwesome6 name="graduation-cap"
-                                color={colors.primary}
-                                size={26} />
-                            }
-                        />
-                    </View>
-
                 </View>
 
-            </View>
-        </View>
+                <View style={styles.section}>
+                    <View style={styles.sectionHeader}>
+                        <Text style={styles.sectionTitle}>Próximas atividades</Text>
+                        <Link href="/activity" style={styles.sectionLink}>Ver todas</Link>
+                    </View>
+
+                    {upcomingActivities.map((activity) => (
+                        <UpcomingActivityCard key={activity.id} activity={activity} />
+                    ))}
+                </View>
+
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Disciplinas do semestre</Text>
+
+                    <View style={styles.disciplines}>
+                        {disciplines.slice(0, HOME_DISCIPLINES_LIMIT).map((discipline) => (
+                            <DisciplineInfoCard key={discipline.id} discipline={discipline} />
+                        ))}
+                    </View>
+                </View>
+            </ScrollView>
+        </SafeAreaView>
     );
 }
-
-

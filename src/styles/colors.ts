@@ -1,8 +1,7 @@
-
-
 export const colors = {
     primary: "#004AC6",
     orange: "#BC4800",
+    orangeDark: "#943700",
     red: "#BA1A1A",
     white: "#FFFFFF",
     green: "#006E2F",
@@ -10,15 +9,30 @@ export const colors = {
         primary: "#191B23",
         secondary: "#434655",
         green: "#007432",
+        orange: "#7D2D00",
+        amber: "#6B4E00",
+        error: "#93000A",
+        light: "#EEEFFF",
+        onOrange: "#FFEDE6",
+        muted: "#737686",
+        placeholder: "rgba(67, 70, 85, 0.5)",
+        tip: "#B4C5FF",
     },
     background: {
         gray: "#E7E7F3",
-        red:"#FFDBCD",
+        red: "#FFDBCD",
+        error: "#FFDAD6",
         green: "#6BFF8F",
         blue: "#EDEDF9",
         primary: "#faf8ff",
+        dashed: "rgba(243, 243, 254, 0.5)",
+        orange: "rgba(188, 72, 0, 0.1)",
+        amber: "#FFE08A",
+        info: "#DBE1FF",
+        overlay: "rgba(25, 27, 35, 0.4)",
     },
     border: "#c3c6d7",
+    borderLight: "rgba(195, 198, 215, 0.3)",
+    borderCard: "#E1E2ED",
     info: "#2563eb",
-
 }
