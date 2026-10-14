@@ -7,7 +7,6 @@ import { useDisciplines } from "@/contexts/DisciplinesContext";
 import { UPCOMING_EXAMS_DAYS, useExams } from "@/contexts/ExamsContext";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Activity, ActivityDetail } from "@/data/activities";
-import { summary } from "@/data/summary";
 import { styles } from "@/screens/Home/styles";
 import { colors } from "@/styles/colors";
 import { isPending } from "@/utils/activityStatus";
@@ -63,7 +62,7 @@ export default function Index() {
 
     return (
         <SafeAreaView style={styles.container} edges={["top"]}>
-            <Header hasNotifications={summary.hasNotifications} />
+            <Header />
 
             <ScrollView contentContainerStyle={styles.content}
                 showsVerticalScrollIndicator={false}

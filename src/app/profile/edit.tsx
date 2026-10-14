@@ -22,6 +22,7 @@ export default function EditProfile() {
                 color={colors.primary}
                 actionIcon="notifications-outline"
                 actionLabel="Notificações"
+                onActionPress={() => router.push("/notifications")}
             />
 
             <ScrollView contentContainerStyle={styles.content}

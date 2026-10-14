@@ -2,7 +2,7 @@ import { ActivityDetail, ActivityStatus, StoredActivityStatus } from "@/data/act
 import { daysUntil, parseIsoDate } from "@/utils/date";
 
 // Hoje, amanhã e depois de amanhã contam como urgente.
-const URGENT_DAYS = 2;
+export const URGENT_DAYS = 2;
 const WEEK_DAYS = 7;
 
 // Status que ainda precisam ser entregues (inclui as que já foram começadas).

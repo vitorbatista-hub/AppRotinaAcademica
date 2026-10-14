@@ -7,7 +7,6 @@ import { useDisciplines } from "@/contexts/DisciplinesContext";
 import { useProfile } from "@/contexts/ProfileContext";
 import { getAvatarSource } from "@/data/profile";
 import { useAvatarPicker } from "@/hooks/useAvatarPicker";
-import { summary } from "@/data/summary";
 import { styles } from "@/screens/Profile/styles";
 import { colors } from "@/styles/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -23,7 +22,7 @@ export default function Profile() {
 
     return (
         <SafeAreaView style={styles.container} edges={["top"]}>
-            <Header hasNotifications={summary.hasNotifications} />
+            <Header />
 
             <ScrollView contentContainerStyle={styles.content}
                 showsVerticalScrollIndicator={false}

@@ -22,6 +22,7 @@ export default function NewDiscipline() {
                 color={colors.primary}
                 actionIcon="notifications-outline"
                 actionLabel="Notificações"
+                onActionPress={() => router.push("/notifications")}
             />
 
             <ScrollView contentContainerStyle={styles.content}

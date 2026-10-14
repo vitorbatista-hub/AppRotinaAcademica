@@ -42,7 +42,14 @@
           "cameraPermission": "O app usa a câmera para você tirar a foto de perfil.",
           "microphonePermission": false
         }
-      ]
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#004AC6"
+        }
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,

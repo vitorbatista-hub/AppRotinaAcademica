@@ -3,7 +3,6 @@ import { Header } from "@/components/Header";
 import { NewActivityCard } from "@/components/NewActivityCard";
 import { isUpcomingExam, useExams } from "@/contexts/ExamsContext";
 import { Exam } from "@/data/exams";
-import { summary } from "@/data/summary";
 import { styles } from "@/screens/Exams/styles";
 import { router } from "expo-router";
 import { ScrollView, Text, View } from "react-native";
@@ -22,7 +21,7 @@ export default function Exams() {
 
     return (
         <SafeAreaView style={styles.container} edges={["top"]}>
-            <Header hasNotifications={summary.hasNotifications} />
+            <Header />
 
             <ScrollView contentContainerStyle={styles.content}
                 showsVerticalScrollIndicator={false}

@@ -1,4 +1,5 @@
 import { Button } from "@/components/Button";
+import { DateInput } from "@/components/DateInput";
 import { FormField } from "@/components/FormField";
 import { Input } from "@/components/Input";
 import { OptionSelector } from "@/components/OptionSelector";
@@ -7,7 +8,7 @@ import { ActivityInput } from "@/contexts/ActivitiesContext";
 import { useDisciplines } from "@/contexts/DisciplinesContext";
 import { ActivityPriority } from "@/data/activities";
 import { colors } from "@/styles/colors";
-import { isPastDate, maskDate, parseDate, toIsoDate } from "@/utils/date";
+import { isPastDate, parseDate, toIsoDate } from "@/utils/date";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
 import { Alert, View } from "react-native";
@@ -49,7 +50,7 @@ const PRIORITIES: { label: string; value: ActivityPriority; color: string; backg
 
 function getDueDateError(dueDate: string) {
     if (!parseDate(dueDate)) {
-        return "Informe uma data válida no formato dd/mm/aaaa.";
+        return "Selecione a data de entrega.";
     }
 }
 
@@ -89,7 +90,7 @@ export function ActivityForm({ initialValues = EMPTY_VALUES, submitLabel, onSubm
             priority,
         });
 
-        // Data passada é permitida (trabalho entregue com atraso), mas pede confirmação para evitar erro de digitação.
+        // Data passada é permitida (trabalho entregue com atraso), mas pede confirmação para evitar um toque errado no calendário.
         // Na edição, só pergunta se o usuário mudou a data; a original pode já ter passado.
         if (dueDate !== initialValues.dueDate && isPastDate(date)) {
             Alert.alert(
@@ -127,12 +128,9 @@ export function ActivityForm({ initialValues = EMPTY_VALUES, submitLabel, onSubm
             </FormField>
 
             <FormField label="Data de entrega" error={errors.dueDate}>
-                <Input value={dueDate}
-                    onChangeText={(text) => setDueDate(maskDate(text))}
-                    placeholder="dd/mm/aaaa"
-                    keyboardType="number-pad"
-                    maxLength={10}
-                    icon="calendar-outline"
+                <DateInput value={dueDate}
+                    onChange={setDueDate}
+                    placeholder="Selecione a data"
                     hasError={!!errors.dueDate}
                     accessibilityLabel="Data de entrega"
                 />

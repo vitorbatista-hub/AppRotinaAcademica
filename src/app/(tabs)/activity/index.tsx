@@ -2,12 +2,14 @@ import { ActivityCard } from "@/components/ActivityCard";
 import { FilterChip } from "@/components/FilterChip";
 import { Header } from "@/components/Header";
 import { NewActivityCard } from "@/components/NewActivityCard";
+import { SearchInput } from "@/components/SearchInput";
 import { useActivities } from "@/contexts/ActivitiesContext";
 import { ActivityDetail } from "@/data/activities";
-import { summary } from "@/data/summary";
 import { styles } from "@/screens/Activity/styles";
 import { isDueThisWeek, NOT_STARTED_STATUSES } from "@/utils/activityStatus";
+import { matchesSearch } from "@/utils/text";
 import { router, useLocalSearchParams } from "expo-router";
+import { useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -32,14 +34,20 @@ export default function Activity() {
     const { filter: filterParam } = useLocalSearchParams<{ filter?: string }>();
     const filter = FILTERS.find((item) => item.key === filterParam) ?? FILTERS[0];
 
-    const filteredActivities = activities.filter(filter.matches);
+    const [search, setSearch] = useState("");
+
+    // A busca soma com o filtro: "Esta semana" + "cálculo" mostra só as de cálculo da semana.
+    const filteredActivities = activities.filter((activity) =>
+        filter.matches(activity) && matchesSearch(search, [activity.title, activity.discipline, activity.description])
+    );
 
     return (
         <SafeAreaView style={styles.container} edges={["top"]}>
-            <Header hasNotifications={summary.hasNotifications} />
+            <Header />
 
             <ScrollView contentContainerStyle={styles.content}
                 showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
             >
                 <View style={styles.titleContent}>
                     <Text style={styles.title}>Atividades e Prazos</Text>
@@ -47,6 +55,12 @@ export default function Activity() {
                         Acompanhe suas entregas e mantenha sua rotina em dia.
                     </Text>
                 </View>
+
+                <SearchInput value={search}
+                    onChangeText={setSearch}
+                    placeholder="Buscar atividade ou disciplina..."
+                    accessibilityLabel="Buscar atividade ou disciplina"
+                />
 
                 <ScrollView horizontal
                     style={styles.filters}

@@ -4,9 +4,11 @@ import { Button } from "@/components/Button";
 import { InfoCard } from "@/components/InfoCard";
 import { TipCard } from "@/components/TipCard";
 import { useActivities } from "@/contexts/ActivitiesContext";
+import { useExams } from "@/contexts/ExamsContext";
 import { ActivityPriority, ActivityStatus } from "@/data/activities";
 import { styles } from "@/screens/ActivityDetails/styles";
 import { NOT_STARTED_STATUSES } from "@/utils/activityStatus";
+import { getStudyTip } from "@/utils/studyTip";
 import { colors } from "@/styles/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useLocalSearchParams } from "expo-router";
@@ -71,11 +73,10 @@ const PRIORITY_BADGES: Record<ActivityPriority, BadgeStyle> = {
     },
 };
 
-const STUDY_TIP = "Comece esta atividade com antecedência para evitar atrasos na entrega.";
-
 export default function ActivityDetails() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const { activities, startActivity, completeActivity, reopenActivity, deleteActivity } = useActivities();
+    const { exams } = useExams();
     const insets = useSafeAreaInsets();
 
     const activity = activities.find((item) => item.id === id);
@@ -165,7 +166,7 @@ export default function ActivityDetails() {
                     />
                 </View>
 
-                {!isDone && <TipCard title="Dica de Estudo" text={STUDY_TIP} />}
+                {!isDone && <TipCard title="Dica de Estudo" text={getStudyTip(activity, exams)} />}
 
                 <View style={styles.description}>
                     <View style={styles.descriptionHeader}>

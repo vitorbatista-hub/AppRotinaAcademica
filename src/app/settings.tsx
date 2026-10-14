@@ -5,7 +5,7 @@ import { styles } from "@/screens/Settings/styles";
 import { colors } from "@/styles/colors";
 import Constants from "expo-constants";
 import { router } from "expo-router";
-import { ScrollView, Text, View } from "react-native";
+import { Linking, Platform, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Settings() {
@@ -17,6 +17,7 @@ export default function Settings() {
                 color={colors.primary}
                 actionIcon="notifications-outline"
                 actionLabel="Notificações"
+                onActionPress={() => router.push("/notifications")}
             />
 
             <ScrollView contentContainerStyle={styles.content}
@@ -37,6 +38,27 @@ export default function Settings() {
                             label="Foto de perfil"
                             onPress={openAvatarMenu}
                         />
+                    </View>
+                </View>
+
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Notificações</Text>
+
+                    <View style={styles.card}>
+                        <SettingsItem icon="notifications-outline"
+                            label="Prazos próximos"
+                            onPress={() => router.push("/notifications")}
+                        />
+                        {Platform.OS !== "web" && (
+                            <>
+                                <View style={styles.divider} />
+                                {/* Lembretes negados só podem ser liberados nos ajustes do sistema. */}
+                                <SettingsItem icon="alarm-outline"
+                                    label="Permitir lembretes"
+                                    onPress={() => Linking.openSettings()}
+                                />
+                            </>
+                        )}
                     </View>
                 </View>
 

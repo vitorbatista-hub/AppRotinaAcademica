@@ -1,3 +1,4 @@
+import { DeadlineReminders } from "@/components/DeadlineReminders";
 import { Loading } from "@/components/Loading";
 import { ActivitiesProvider } from "@/contexts/ActivitiesContext";
 import { DisciplinesProvider } from "@/contexts/DisciplinesContext";
@@ -44,6 +45,7 @@ export default function RootLayout() {
                 <ActivitiesProvider>
                     <DisciplinesProvider>
                         <ExamsProvider>
+                            <DeadlineReminders />
                             <Stack screenOptions={{
                                 headerShown: false,
                             }}>
@@ -56,6 +58,7 @@ export default function RootLayout() {
                                 <Stack.Screen name="discipline/edit/[id]" />
                                 <Stack.Screen name="profile/edit" />
                                 <Stack.Screen name="settings" />
+                                <Stack.Screen name="notifications" />
                             </Stack>
                         </ExamsProvider>
                     </DisciplinesProvider>

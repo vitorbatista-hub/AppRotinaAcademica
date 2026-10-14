@@ -1,11 +1,12 @@
 import { Button } from "@/components/Button";
+import { DateInput } from "@/components/DateInput";
 import { FormField } from "@/components/FormField";
 import { Input } from "@/components/Input";
 import { Select } from "@/components/Select";
 import { useDisciplines } from "@/contexts/DisciplinesContext";
 import { ExamInput } from "@/data/exams";
 import { colors } from "@/styles/colors";
-import { isPastDate, maskDate, parseDate, toIsoDate } from "@/utils/date";
+import { isPastDate, parseDate, toIsoDate } from "@/utils/date";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
 import { Alert, View } from "react-native";
@@ -52,7 +53,7 @@ export function ExamForm({ initialValues = EMPTY_VALUES, submitLabel, onSubmit }
     const formErrors: FormErrors = {
         title: title.trim() ? undefined : "Informe o nome da prova.",
         discipline: selectedDiscipline ? undefined : "Selecione uma disciplina.",
-        date: parsedDate ? undefined : "Informe uma data válida no formato dd/mm/aaaa.",
+        date: parsedDate ? undefined : "Selecione a data da prova.",
     };
     // Os erros só aparecem depois da primeira tentativa de salvar.
     const errors = wasSubmitted ? formErrors : {};
@@ -71,7 +72,7 @@ export function ExamForm({ initialValues = EMPTY_VALUES, submitLabel, onSubmit }
             notes: notes.trim(),
         });
 
-        // Data passada é permitida (registrar uma prova que já aconteceu), mas pede confirmação para evitar erro de digitação.
+        // Data passada é permitida (registrar uma prova que já aconteceu), mas pede confirmação para evitar um toque errado no calendário.
         if (date !== initialValues.date && isPastDate(parsedDate)) {
             Alert.alert(
                 "Data já passou",
@@ -108,12 +109,9 @@ export function ExamForm({ initialValues = EMPTY_VALUES, submitLabel, onSubmit }
             </FormField>
 
             <FormField label="Data da prova" error={errors.date}>
-                <Input value={date}
-                    onChangeText={(text) => setDate(maskDate(text))}
-                    placeholder="dd/mm/aaaa"
-                    keyboardType="number-pad"
-                    maxLength={10}
-                    icon="calendar-outline"
+                <DateInput value={date}
+                    onChange={setDate}
+                    placeholder="Selecione a data"
                     hasError={!!errors.date}
                     accessibilityLabel="Data da prova"
                 />
