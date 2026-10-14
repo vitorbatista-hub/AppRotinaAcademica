@@ -1,11 +1,12 @@
 import { Discipline } from "@/data/disciplines";
 import { colors } from "@/styles/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { styles } from "./styles";
 
 type DisciplineInfoCardProps = {
     discipline: Discipline;
+    onPress?: () => void;
 };
 
 type InfoRowProps = {
@@ -22,9 +23,14 @@ function InfoRow({ icon, text }: InfoRowProps) {
     );
 }
 
-export function DisciplineInfoCard({ discipline }: DisciplineInfoCardProps) {
+export function DisciplineInfoCard({ discipline, onPress }: DisciplineInfoCardProps) {
     return (
-        <View style={[styles.container, { borderLeftColor: discipline.color }]}>
+        <TouchableOpacity activeOpacity={0.7}
+            style={[styles.container, { borderLeftColor: discipline.color }]}
+            onPress={onPress}
+            accessibilityRole="button"
+            accessibilityLabel={`Ver detalhes de ${discipline.name}`}
+        >
             <View style={styles.header}>
                 <Text style={styles.name} numberOfLines={2}>{discipline.name}</Text>
                 <Ionicons name={discipline.icon} size={20} color={colors.text.secondary} />
@@ -35,6 +41,6 @@ export function DisciplineInfoCard({ discipline }: DisciplineInfoCardProps) {
                 <InfoRow icon="time-outline" text={discipline.schedule} />
                 <InfoRow icon="business-outline" text={discipline.room} />
             </View>
-        </View>
+        </TouchableOpacity>
     );
 }

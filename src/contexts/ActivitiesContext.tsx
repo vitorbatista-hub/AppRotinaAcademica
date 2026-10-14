@@ -17,6 +17,7 @@ type ActivityRow = {
     id: number;
     title: string;
     description: string;
+    disciplineId: number;
     discipline: string;
     icon: ActivityDetail["icon"];
     dueDate: string;
@@ -29,6 +30,8 @@ type ActivitiesContextData = {
     pendingCount: number;
     weekCount: number;
     completedCount: number;
+    // Relê do banco; usado quando uma disciplina é editada ou excluída.
+    reloadActivities: () => Promise<void>;
     addActivity: (activity: ActivityInput) => Promise<void>;
     updateActivity: (id: string, activity: ActivityInput) => Promise<void>;
     deleteActivity: (id: string) => Promise<void>;
@@ -47,7 +50,7 @@ export function ActivitiesProvider({ children }: { children: ReactNode }) {
         // As concluídas ficam no fim; as demais, da entrega mais próxima para a mais distante.
         const rows = await db.getAllAsync<ActivityRow>(`
             SELECT a.id, a.title, a.description, a.due_date AS dueDate, a.status, a.priority,
-                   d.name AS discipline, d.icon
+                   a.discipline_id AS disciplineId, d.name AS discipline, d.icon
             FROM activities a
             JOIN disciplines d ON d.id = a.discipline_id
             ORDER BY a.status = 'done', a.due_date, a.id
@@ -56,6 +59,7 @@ export function ActivitiesProvider({ children }: { children: ReactNode }) {
         return rows.map((row) => ({
             ...row,
             id: String(row.id),
+            disciplineId: String(row.disciplineId),
             status: getActivityStatus(row.status, row.dueDate),
             dueLabel: formatDueLabel(parseIsoDate(row.dueDate)),
         }));
@@ -64,6 +68,10 @@ export function ActivitiesProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         fetchActivities().then(setActivities);
     }, [fetchActivities]);
+
+    async function reloadActivities() {
+        setActivities(await fetchActivities());
+    }
 
     async function addActivity(activity: ActivityInput) {
         await db.runAsync(
@@ -124,6 +132,7 @@ export function ActivitiesProvider({ children }: { children: ReactNode }) {
             pendingCount,
             weekCount,
             completedCount,
+            reloadActivities,
             addActivity,
             updateActivity,
             deleteActivity,

@@ -1,11 +1,12 @@
 import { Discipline } from "@/data/disciplines";
 import { colors } from "@/styles/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { styles } from "./styles";
 
 type DisciplineCardProps = {
     discipline: Discipline;
+    onPress?: () => void;
 };
 
 type DetailProps = {
@@ -36,11 +37,16 @@ function getStatusLabel(pendingCount: number) {
     return pendingCount === 1 ? "1 Pendente" : `${pendingCount} Pendentes`;
 }
 
-export function DisciplineCard({ discipline }: DisciplineCardProps) {
+export function DisciplineCard({ discipline, onPress }: DisciplineCardProps) {
     const isUpToDate = discipline.pendingCount === 0;
 
     return (
-        <View style={[styles.container, { borderLeftColor: discipline.color }]}>
+        <TouchableOpacity activeOpacity={0.7}
+            style={[styles.container, { borderLeftColor: discipline.color }]}
+            onPress={onPress}
+            accessibilityRole="button"
+            accessibilityLabel={`Ver detalhes de ${discipline.name}`}
+        >
             <View style={styles.header}>
                 <View style={styles.info}>
                     <Text style={styles.name} numberOfLines={2}>{discipline.name}</Text>
@@ -63,6 +69,6 @@ export function DisciplineCard({ discipline }: DisciplineCardProps) {
                 <Detail icon="time-outline" label="Horário" value={discipline.schedule} />
                 <Detail icon="business-outline" label="Sala" value={discipline.room} />
             </View>
-        </View>
+        </TouchableOpacity>
     );
 }

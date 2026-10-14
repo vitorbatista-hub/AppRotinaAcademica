@@ -4,6 +4,7 @@ import { SummaryCard } from "@/components/SummaryCard";
 import { UpcomingActivityCard } from "@/components/UpcomingActivityCard";
 import { useActivities } from "@/contexts/ActivitiesContext";
 import { useDisciplines } from "@/contexts/DisciplinesContext";
+import { UPCOMING_EXAMS_DAYS, useExams } from "@/contexts/ExamsContext";
 import { Activity, ActivityDetail } from "@/data/activities";
 import { summary } from "@/data/summary";
 import { styles } from "@/screens/Home/styles";
@@ -47,6 +48,7 @@ function toUpcomingActivity(activity: ActivityDetail): Activity {
 export default function Index() {
     const { activities, weekCount } = useActivities();
     const { disciplines } = useDisciplines();
+    const { upcomingCount: examsCount } = useExams();
 
     // A lista já vem do banco ordenada pela data de entrega.
     const upcomingActivities = activities
@@ -82,9 +84,9 @@ export default function Index() {
 
                     <View style={styles.cardContent}>
                         <View style={styles.card}>
-                            <SummaryCard total={summary.exams}
+                            <SummaryCard total={examsCount}
                                 title="Provas"
-                                subtitle="Próximos 15 dias"
+                                subtitle={`Próximos ${UPCOMING_EXAMS_DAYS} dias`}
                                 textColor={colors.red}
                                 accentColor={colors.background.error}
                                 icon={
@@ -92,6 +94,7 @@ export default function Index() {
                                         color={colors.red}
                                         size={SUMMARY_ICON_SIZE} />
                                 }
+                                onPress={() => router.navigate("/exam")}
                             />
                         </View>
 
@@ -135,7 +138,13 @@ export default function Index() {
 
                     <View style={styles.disciplines}>
                         {disciplines.slice(0, HOME_DISCIPLINES_LIMIT).map((discipline) => (
-                            <DisciplineInfoCard key={discipline.id} discipline={discipline} />
+                            <DisciplineInfoCard key={discipline.id}
+                                discipline={discipline}
+                                onPress={() => router.push({
+                                    pathname: "/discipline/[id]",
+                                    params: { id: discipline.id },
+                                })}
+                            />
                         ))}
                     </View>
                 </View>

@@ -24,6 +24,7 @@ export type ActivityDetail = {
     id: string;
     title: string;
     description: string;
+    disciplineId: string;
     discipline: string;
     icon: keyof typeof Ionicons.glyphMap;
     dueDate: string;
