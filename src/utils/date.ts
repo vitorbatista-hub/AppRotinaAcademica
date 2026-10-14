@@ -31,6 +31,13 @@ export function isPastDate(date: Date, today = new Date()) {
     return date.getTime() < startOfDay(today).getTime();
 }
 
+// Inverso do parseDate: Date vira "24/10/2026".
+export function formatDate(date: Date) {
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    return `${day}/${month}/${date.getFullYear()}`;
+}
+
 // Formato gravado no banco: "2026-10-24".
 export function toIsoDate(date: Date) {
     const month = String(date.getMonth() + 1).padStart(2, "0");

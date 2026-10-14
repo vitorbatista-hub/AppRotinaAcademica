@@ -46,6 +46,7 @@ export default function RootLayout() {
                         <Stack.Screen name="index" />
                         <Stack.Screen name="(tabs)" />
                         <Stack.Screen name="activity/[id]" />
+                        <Stack.Screen name="activity/edit/[id]" />
                     </Stack>
                 </DisciplinesProvider>
             </ActivitiesProvider>

@@ -10,7 +10,7 @@ import { styles } from "@/screens/Home/styles";
 import { colors } from "@/styles/colors";
 import { daysUntil, parseIsoDate } from "@/utils/date";
 import { FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -107,7 +107,13 @@ export default function Index() {
                     </View>
 
                     {upcomingActivities.map((activity) => (
-                        <UpcomingActivityCard key={activity.id} activity={activity} />
+                        <UpcomingActivityCard key={activity.id}
+                            activity={activity}
+                            onPress={() => router.push({
+                                pathname: "/activity/[id]",
+                                params: { id: activity.id },
+                            })}
+                        />
                     ))}
                 </View>
 

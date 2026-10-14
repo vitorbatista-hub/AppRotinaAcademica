@@ -1,16 +1,22 @@
 import { Activity } from "@/data/activities";
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { styles } from "./styles";
 
 type UpcomingActivityCardProps = {
     activity: Activity;
+    onPress?: () => void;
 };
 
-export function UpcomingActivityCard({ activity }: UpcomingActivityCardProps) {
+export function UpcomingActivityCard({ activity, onPress }: UpcomingActivityCardProps) {
     const isWarning = activity.tone === "warning";
 
     return (
-        <View style={styles.container}>
+        <TouchableOpacity activeOpacity={0.7}
+            style={styles.container}
+            onPress={onPress}
+            accessibilityRole="button"
+            accessibilityLabel={`Ver detalhes de ${activity.title}`}
+        >
             <View style={styles.info}>
                 <View style={[styles.badge, isWarning && styles.badgeWarning]}>
                     <Text style={[styles.badgeText, isWarning && styles.badgeTextWarning]}>
@@ -22,6 +28,6 @@ export function UpcomingActivityCard({ activity }: UpcomingActivityCardProps) {
             </View>
 
             <Text style={[styles.due, isWarning && styles.dueWarning]}>{activity.dueLabel}</Text>
-        </View>
+        </TouchableOpacity>
     );
 }

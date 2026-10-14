@@ -83,6 +83,12 @@ export const styles = StyleSheet.create({
         flexShrink: 1,
     },
 
+    actions: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 16,
+    },
+
     delivered: {
         color: colors.green,
     },

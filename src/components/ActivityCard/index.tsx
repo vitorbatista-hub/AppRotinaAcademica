@@ -75,9 +75,8 @@ export function ActivityCard({ activity, onDetailsPress }: ActivityCardProps) {
                     </Text>
                 </View>
 
-                {isDone ? (
-                    <Text style={[styles.caption, styles.delivered]}>Entregue</Text>
-                ) : (
+                <View style={styles.actions}>
+                    {isDone && <Text style={[styles.caption, styles.delivered]}>Entregue</Text>}
                     <TouchableOpacity activeOpacity={0.7}
                         hitSlop={12}
                         onPress={onDetailsPress}
@@ -86,7 +85,7 @@ export function ActivityCard({ activity, onDetailsPress }: ActivityCardProps) {
                     >
                         <Text style={[styles.caption, styles.link]}>Ver detalhes</Text>
                     </TouchableOpacity>
-                )}
+                </View>
             </View>
         </View>
     );

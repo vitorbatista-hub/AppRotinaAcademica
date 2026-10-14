@@ -3,7 +3,7 @@ import { formatDueLabel, parseIsoDate } from "@/utils/date";
 import { useSQLiteContext } from "expo-sqlite";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 
-export type NewActivity = {
+export type ActivityInput = {
     title: string;
     description: string;
     disciplineId: string;
@@ -27,12 +27,19 @@ type ActivitiesContextData = {
     activities: ActivityDetail[];
     pendingCount: number;
     completedCount: number;
-    addActivity: (activity: NewActivity) => Promise<void>;
+    addActivity: (activity: ActivityInput) => Promise<void>;
+    updateActivity: (id: string, activity: ActivityInput) => Promise<void>;
+    deleteActivity: (id: string) => Promise<void>;
     completeActivity: (id: string) => Promise<void>;
 };
 
 // Mesmos status do filtro "Pendentes" da tela de atividades e do pendingCount das disciplinas.
 const PENDING_STATUSES: ActivityStatus[] = ["urgent", "upcoming"];
+
+// Regra provisória até a Fase 2: alta prioridade entra como urgente.
+function getInitialStatus(priority: ActivityPriority): ActivityStatus {
+    return priority === "high" ? "urgent" : "upcoming";
+}
 
 const ActivitiesContext = createContext<ActivitiesContextData | null>(null);
 
@@ -61,7 +68,7 @@ export function ActivitiesProvider({ children }: { children: ReactNode }) {
         fetchActivities().then(setActivities);
     }, [fetchActivities]);
 
-    async function addActivity(activity: NewActivity) {
+    async function addActivity(activity: ActivityInput) {
         await db.runAsync(
             `INSERT INTO activities (title, description, discipline_id, due_date, status, priority)
              VALUES (?, ?, ?, ?, ?, ?)`,
@@ -69,9 +76,32 @@ export function ActivitiesProvider({ children }: { children: ReactNode }) {
             activity.description,
             activity.disciplineId,
             activity.dueDate,
-            activity.priority === "high" ? "urgent" : "upcoming",
+            getInitialStatus(activity.priority),
             activity.priority
         );
+        setActivities(await fetchActivities());
+    }
+
+    async function updateActivity(id: string, activity: ActivityInput) {
+        // Em andamento e concluída continuam como estão; as pendentes seguem a prioridade nova.
+        await db.runAsync(
+            `UPDATE activities
+             SET title = ?, description = ?, discipline_id = ?, due_date = ?, priority = ?,
+                 status = CASE WHEN status IN ('urgent', 'upcoming') THEN ? ELSE status END
+             WHERE id = ?`,
+            activity.title,
+            activity.description,
+            activity.disciplineId,
+            activity.dueDate,
+            activity.priority,
+            getInitialStatus(activity.priority),
+            id
+        );
+        setActivities(await fetchActivities());
+    }
+
+    async function deleteActivity(id: string) {
+        await db.runAsync("DELETE FROM activities WHERE id = ?", id);
         setActivities(await fetchActivities());
     }
 
@@ -89,7 +119,15 @@ export function ActivitiesProvider({ children }: { children: ReactNode }) {
     const completedCount = activities.filter((activity) => activity.status === "done").length;
 
     return (
-        <ActivitiesContext.Provider value={{ activities, pendingCount, completedCount, addActivity, completeActivity }}>
+        <ActivitiesContext.Provider value={{
+            activities,
+            pendingCount,
+            completedCount,
+            addActivity,
+            updateActivity,
+            deleteActivity,
+            completeActivity,
+        }}>
             {children}
         </ActivitiesContext.Provider>
     );

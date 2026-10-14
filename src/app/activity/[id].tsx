@@ -9,7 +9,7 @@ import { styles } from "@/screens/ActivityDetails/styles";
 import { colors } from "@/styles/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useLocalSearchParams } from "expo-router";
-import { ScrollView, Text, View } from "react-native";
+import { Alert, ScrollView, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 type BadgeStyle = {
@@ -68,7 +68,7 @@ const STUDY_TIP = "Comece esta atividade com antecedência para evitar atrasos n
 
 export default function ActivityDetails() {
     const { id } = useLocalSearchParams<{ id: string }>();
-    const { activities, completeActivity } = useActivities();
+    const { activities, completeActivity, deleteActivity } = useActivities();
     const insets = useSafeAreaInsets();
 
     const activity = activities.find((item) => item.id === id);
@@ -90,9 +90,42 @@ export default function ActivityDetails() {
         router.back();
     }
 
+    function handleEdit() {
+        router.push({ pathname: "/activity/edit/[id]", params: { id: activity!.id } });
+    }
+
+    async function handleDelete() {
+        // Volta antes de apagar para a tela não mostrar "Atividade não encontrada" por um instante.
+        router.back();
+        await deleteActivity(activity!.id);
+    }
+
+    function confirmDelete() {
+        Alert.alert(
+            "Excluir atividade",
+            `Tem certeza que deseja excluir "${activity!.title}"? Essa ação não pode ser desfeita.`,
+            [
+                { text: "Cancelar", style: "cancel" },
+                { text: "Excluir", style: "destructive", onPress: handleDelete },
+            ]
+        );
+    }
+
+    function handleMoreOptions() {
+        Alert.alert(activity!.title, undefined, [
+            { text: "Editar", onPress: handleEdit },
+            { text: "Excluir", style: "destructive", onPress: confirmDelete },
+            { text: "Cancelar", style: "cancel" },
+        ]);
+    }
+
     return (
         <SafeAreaView style={styles.container} edges={["top"]}>
-            <BackHeader title="Detalhes" actionIcon="ellipsis-vertical" actionLabel="Mais opções" />
+            <BackHeader title="Detalhes"
+                actionIcon="ellipsis-vertical"
+                actionLabel="Mais opções"
+                onActionPress={handleMoreOptions}
+            />
 
             <ScrollView contentContainerStyle={styles.content}
                 showsVerticalScrollIndicator={false}
@@ -133,7 +166,7 @@ export default function ActivityDetails() {
                         color={colors.green}
                         icon={<Ionicons name="checkmark-circle-outline" size={20} color={colors.white} />}
                         textStyle={styles.actionText}
-                        style={styles. completeButton}
+                        style={styles.completeButton}
                         onPress={handleComplete}
                     />
                 )}
@@ -142,6 +175,7 @@ export default function ActivityDetails() {
                     variant="outlined"
                     icon={<Ionicons name="create-outline" size={18} color={colors.text.secondary} />}
                     textStyle={styles.actionText}
+                    onPress={handleEdit}
                 />
             </View>
         </SafeAreaView>
