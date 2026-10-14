@@ -2,6 +2,7 @@ import { Loading } from "@/components/Loading";
 import { ActivitiesProvider } from "@/contexts/ActivitiesContext";
 import { DisciplinesProvider } from "@/contexts/DisciplinesContext";
 import { ExamsProvider } from "@/contexts/ExamsContext";
+import { ProfileProvider } from "@/contexts/ProfileContext";
 import { DATABASE_NAME, migrateDbIfNeeded } from "@/database";
 import {
     Manrope_300Light,
@@ -39,23 +40,27 @@ export default function RootLayout() {
 
     return (
         <SQLiteProvider databaseName={DATABASE_NAME} onInit={migrateDbIfNeeded}>
-            <ActivitiesProvider>
-                <DisciplinesProvider>
-                    <ExamsProvider>
-                        <Stack screenOptions={{
-                            headerShown: false,
-                        }}>
-                            <Stack.Screen name="index" />
-                            <Stack.Screen name="(tabs)" />
-                            <Stack.Screen name="activity/[id]" />
-                            <Stack.Screen name="activity/edit/[id]" />
-                            <Stack.Screen name="discipline/new" />
-                            <Stack.Screen name="discipline/[id]" />
-                            <Stack.Screen name="discipline/edit/[id]" />
-                        </Stack>
-                    </ExamsProvider>
-                </DisciplinesProvider>
-            </ActivitiesProvider>
+            <ProfileProvider>
+                <ActivitiesProvider>
+                    <DisciplinesProvider>
+                        <ExamsProvider>
+                            <Stack screenOptions={{
+                                headerShown: false,
+                            }}>
+                                <Stack.Screen name="index" />
+                                <Stack.Screen name="(tabs)" />
+                                <Stack.Screen name="activity/[id]" />
+                                <Stack.Screen name="activity/edit/[id]" />
+                                <Stack.Screen name="discipline/new" />
+                                <Stack.Screen name="discipline/[id]" />
+                                <Stack.Screen name="discipline/edit/[id]" />
+                                <Stack.Screen name="profile/edit" />
+                                <Stack.Screen name="settings" />
+                            </Stack>
+                        </ExamsProvider>
+                    </DisciplinesProvider>
+                </ActivitiesProvider>
+            </ProfileProvider>
         </SQLiteProvider>
     );
 }

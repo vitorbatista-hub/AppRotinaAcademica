@@ -4,7 +4,9 @@ import { StatCard } from "@/components/StatCard";
 import { StatHighlightCard } from "@/components/StatHighlightCard";
 import { useActivities } from "@/contexts/ActivitiesContext";
 import { useDisciplines } from "@/contexts/DisciplinesContext";
-import { profile } from "@/data/profile";
+import { useProfile } from "@/contexts/ProfileContext";
+import { getAvatarSource } from "@/data/profile";
+import { useAvatarPicker } from "@/hooks/useAvatarPicker";
 import { summary } from "@/data/summary";
 import { styles } from "@/screens/Profile/styles";
 import { colors } from "@/styles/colors";
@@ -16,6 +18,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function Profile() {
     const { pendingCount, completedCount } = useActivities();
     const { disciplines } = useDisciplines();
+    const { profile } = useProfile();
+    const { openAvatarMenu } = useAvatarPicker();
 
     return (
         <SafeAreaView style={styles.container} edges={["top"]}>
@@ -26,7 +30,7 @@ export default function Profile() {
             >
                 <View style={styles.profile}>
                     <View style={styles.avatarContent}>
-                        <Image source={require("@/assets/images/avatar-large.jpg")}
+                        <Image source={getAvatarSource(profile, "large")}
                             style={styles.avatar}
                             accessibilityLabel="Foto de perfil do estudante"
                         />
@@ -34,6 +38,7 @@ export default function Profile() {
                             style={styles.editButton}
                             accessibilityRole="button"
                             accessibilityLabel="Editar foto de perfil"
+                            onPress={openAvatarMenu}
                         >
                             <Ionicons name="camera" size={18} color={colors.primary} />
                         </TouchableOpacity>
@@ -52,6 +57,7 @@ export default function Profile() {
                         icon={<Ionicons name="settings-outline" size={18} color={colors.white} />}
                         textStyle={styles.settingsText}
                         style={styles.settingsButton}
+                        onPress={() => router.push("/settings")}
                     />
                 </View>
 

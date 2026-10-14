@@ -1,6 +1,6 @@
 import { SQLiteDatabase } from "expo-sqlite";
 
-const DATABASE_VERSION = 2;
+const DATABASE_VERSION = 3;
 
 export const DATABASE_NAME = "rotina.db";
 
@@ -80,6 +80,26 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase) {
             FROM disciplines WHERE id = 4;
 
             PRAGMA user_version = 2;
+        `);
+        currentVersion = 2;
+    }
+
+    // v3: perfil do estudante, que antes ficava fixo em src/data/profile.ts.
+    // Só existe uma linha (id 1); avatar_uri vazio significa usar a foto padrão.
+    if (currentVersion === 2) {
+        await db.execAsync(`
+            CREATE TABLE profile (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                name TEXT NOT NULL,
+                course TEXT NOT NULL,
+                semester TEXT NOT NULL,
+                avatar_uri TEXT NOT NULL DEFAULT ''
+            );
+
+            INSERT INTO profile (id, name, course, semester) VALUES
+                (1, 'Estudante Universitário', 'Sistemas de Informação', '2º/2026');
+
+            PRAGMA user_version = 3;
         `);
     }
 }

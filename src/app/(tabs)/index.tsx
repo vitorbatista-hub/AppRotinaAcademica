@@ -5,6 +5,7 @@ import { UpcomingActivityCard } from "@/components/UpcomingActivityCard";
 import { useActivities } from "@/contexts/ActivitiesContext";
 import { useDisciplines } from "@/contexts/DisciplinesContext";
 import { UPCOMING_EXAMS_DAYS, useExams } from "@/contexts/ExamsContext";
+import { useProfile } from "@/contexts/ProfileContext";
 import { Activity, ActivityDetail } from "@/data/activities";
 import { summary } from "@/data/summary";
 import { styles } from "@/screens/Home/styles";
@@ -49,6 +50,10 @@ export default function Index() {
     const { activities, weekCount } = useActivities();
     const { disciplines } = useDisciplines();
     const { upcomingCount: examsCount } = useExams();
+    const { profile } = useProfile();
+
+    // Só o primeiro nome, para a saudação caber numa linha.
+    const firstName = profile.name.split(" ")[0];
 
     // A lista já vem do banco ordenada pela data de entrega.
     const upcomingActivities = activities
@@ -64,7 +69,7 @@ export default function Index() {
                 showsVerticalScrollIndicator={false}
             >
                 <View style={styles.titleContent}>
-                    <Text style={styles.title}>Olá, estudante!</Text>
+                    <Text style={styles.title}>Olá, {firstName}!</Text>
                     <Text style={styles.subtitle}>Organize sua rotina acadêmica</Text>
                 </View>
 

@@ -1,3 +1,5 @@
+import { useProfile } from "@/contexts/ProfileContext";
+import { getAvatarSource } from "@/data/profile";
 import { colors } from "@/styles/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image, Text, TouchableOpacity, View } from "react-native";
@@ -9,10 +11,12 @@ type HeaderProps = {
 };
 
 export function Header({ hasNotifications = false, onNotificationsPress }: HeaderProps) {
+    const { profile } = useProfile();
+
     return (
         <View style={styles.container}>
             <View style={styles.brand}>
-                <Image source={require("@/assets/images/avatar.jpg")}
+                <Image source={getAvatarSource(profile, "small")}
                     style={styles.avatar}
                     accessibilityLabel="Foto de perfil do estudante"
                 />
