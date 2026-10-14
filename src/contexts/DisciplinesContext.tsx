@@ -16,13 +16,13 @@ export function DisciplinesProvider({ children }: { children: ReactNode }) {
     const { activities } = useActivities();
     const [disciplines, setDisciplines] = useState<Discipline[]>();
 
-    // O pendingCount sai das atividades, então a consulta é refeita sempre que elas mudam.
+    // O pendingCount conta tudo que não foi concluído (inclui em andamento) e sai das atividades, então a consulta é refeita sempre que elas mudam.
     useEffect(() => {
         db.getAllAsync<DisciplineRow>(`
             SELECT d.id, d.name, d.teacher, d.schedule, d.room, d.color, d.icon,
                    COUNT(a.id) AS pendingCount
             FROM disciplines d
-            LEFT JOIN activities a ON a.discipline_id = d.id AND a.status IN ('urgent', 'upcoming')
+            LEFT JOIN activities a ON a.discipline_id = d.id AND a.status != 'done'
             GROUP BY d.id
             ORDER BY d.id
         `).then((rows) => {

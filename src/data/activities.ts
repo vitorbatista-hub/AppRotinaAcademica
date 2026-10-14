@@ -11,7 +11,12 @@ export type Activity = {
     tone: ActivityTone;
 };
 
-export type ActivityStatus = "urgent" | "upcoming" | "inProgress" | "done";
+// Status mostrado na tela. Atrasada, urgente e próxima são calculadas pela data de entrega.
+export type ActivityStatus = "late" | "urgent" | "upcoming" | "inProgress" | "done";
+
+// Status gravado no banco. Toda atividade não iniciada fica como "upcoming"
+// ("urgent" só aparece em registros antigos e é tratado igual).
+export type StoredActivityStatus = "urgent" | "upcoming" | "inProgress" | "done";
 
 export type ActivityPriority = "low" | "medium" | "high";
 

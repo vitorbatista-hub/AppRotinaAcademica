@@ -10,7 +10,7 @@ import { colors } from "@/styles/colors";
 import { isPastDate, maskDate, parseDate, toIsoDate } from "@/utils/date";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
-import { View } from "react-native";
+import { Alert, View } from "react-native";
 import { styles } from "./styles";
 
 // Valores que o formulário começa preenchido; a data vem no formato dd/mm/aaaa.
@@ -47,15 +47,9 @@ const PRIORITIES: { label: string; value: ActivityPriority; color: string; backg
     { label: "Alta", value: "high", color: colors.text.error, backgroundColor: colors.background.error },
 ];
 
-// Na edição, a data original pode já ter passado; só barra data passada se o usuário mudou a data.
-function getDueDateError(dueDate: string, initialDueDate: string) {
-    const date = parseDate(dueDate);
-
-    if (!date) {
+function getDueDateError(dueDate: string) {
+    if (!parseDate(dueDate)) {
         return "Informe uma data válida no formato dd/mm/aaaa.";
-    }
-    if (dueDate !== initialDueDate && isPastDate(date)) {
-        return "A data de entrega já passou.";
     }
 }
 
@@ -75,7 +69,7 @@ export function ActivityForm({ initialValues = EMPTY_VALUES, submitLabel, onSubm
     const formErrors: FormErrors = {
         title: title.trim() ? undefined : "Informe o título da atividade.",
         discipline: selectedDiscipline ? undefined : "Selecione uma disciplina.",
-        dueDate: getDueDateError(dueDate, initialValues.dueDate),
+        dueDate: getDueDateError(dueDate),
     };
     // Os erros só aparecem depois da primeira tentativa de salvar.
     const errors = wasSubmitted ? formErrors : {};
@@ -87,13 +81,29 @@ export function ActivityForm({ initialValues = EMPTY_VALUES, submitLabel, onSubm
             return;
         }
 
-        await onSubmit({
+        const submit = () => onSubmit({
             title: title.trim(),
             description: description.trim(),
             disciplineId: selectedDiscipline.id,
             dueDate: toIsoDate(date),
             priority,
         });
+
+        // Data passada é permitida (trabalho entregue com atraso), mas pede confirmação para evitar erro de digitação.
+        // Na edição, só pergunta se o usuário mudou a data; a original pode já ter passado.
+        if (dueDate !== initialValues.dueDate && isPastDate(date)) {
+            Alert.alert(
+                "Data já passou",
+                "A data de entrega informada já passou. Deseja salvar mesmo assim? A atividade aparecerá como atrasada.",
+                [
+                    { text: "Corrigir data", style: "cancel" },
+                    { text: "Salvar", onPress: submit },
+                ]
+            );
+            return;
+        }
+
+        await submit();
     }
 
     return (

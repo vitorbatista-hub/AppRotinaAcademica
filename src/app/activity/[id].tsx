@@ -6,6 +6,7 @@ import { TipCard } from "@/components/TipCard";
 import { useActivities } from "@/contexts/ActivitiesContext";
 import { ActivityPriority, ActivityStatus } from "@/data/activities";
 import { styles } from "@/screens/ActivityDetails/styles";
+import { NOT_STARTED_STATUSES } from "@/utils/activityStatus";
 import { colors } from "@/styles/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useLocalSearchParams } from "expo-router";
@@ -19,16 +20,22 @@ type BadgeStyle = {
     backgroundColor: string;
 };
 
-const PENDING_BADGE: BadgeStyle = {
-    label: "Pendente",
+const NOT_STARTED_BADGE: BadgeStyle = {
+    label: "Não iniciada",
     icon: "time-outline",
     color: colors.text.secondary,
     backgroundColor: colors.background.gray,
 };
 
 const STATUS_BADGES: Record<ActivityStatus, BadgeStyle> = {
-    urgent: PENDING_BADGE,
-    upcoming: PENDING_BADGE,
+    late: {
+        label: "Atrasada",
+        icon: "alert-circle-outline",
+        color: colors.text.error,
+        backgroundColor: colors.background.error,
+    },
+    urgent: NOT_STARTED_BADGE,
+    upcoming: NOT_STARTED_BADGE,
     inProgress: {
         label: "Em andamento",
         icon: "sync",
@@ -68,7 +75,7 @@ const STUDY_TIP = "Comece esta atividade com antecedência para evitar atrasos n
 
 export default function ActivityDetails() {
     const { id } = useLocalSearchParams<{ id: string }>();
-    const { activities, completeActivity, deleteActivity } = useActivities();
+    const { activities, startActivity, completeActivity, reopenActivity, deleteActivity } = useActivities();
     const insets = useSafeAreaInsets();
 
     const activity = activities.find((item) => item.id === id);
@@ -83,7 +90,12 @@ export default function ActivityDetails() {
     }
 
     const isDone = activity.status === "done";
-    const isUrgent = activity.status === "urgent";
+    const isNotStarted = NOT_STARTED_STATUSES.includes(activity.status);
+    const isDueSoon = activity.status === "urgent" || activity.status === "late";
+
+    async function handleStart() {
+        await startActivity(activity!.id);
+    }
 
     async function handleComplete() {
         await completeActivity(activity!.id);
@@ -112,7 +124,13 @@ export default function ActivityDetails() {
     }
 
     function handleMoreOptions() {
+        // Desfaz o "Iniciar" ou o "Concluir" caso o usuário tenha tocado sem querer.
+        const reopenOption = isNotStarted
+            ? []
+            : [{ text: isDone ? "Reabrir atividade" : "Marcar como não iniciada", onPress: () => reopenActivity(activity!.id) }];
+
         Alert.alert(activity!.title, undefined, [
+            ...reopenOption,
             { text: "Editar", onPress: handleEdit },
             { text: "Excluir", style: "destructive", onPress: confirmDelete },
             { text: "Cancelar", style: "cancel" },
@@ -143,7 +161,7 @@ export default function ActivityDetails() {
                     <InfoCard label="Entrega"
                         value={activity.dueLabel}
                         icon="calendar-outline"
-                        valueColor={isUrgent ? colors.red : undefined}
+                        valueColor={isDueSoon ? colors.red : undefined}
                     />
                 </View>
 
@@ -170,13 +188,26 @@ export default function ActivityDetails() {
                         onPress={handleComplete}
                     />
                 )}
-                <Button text="Editar atividade"
-                    color={colors.text.secondary}
-                    variant="outlined"
-                    icon={<Ionicons name="create-outline" size={18} color={colors.text.secondary} />}
-                    textStyle={styles.actionText}
-                    onPress={handleEdit}
-                />
+                <View style={styles.secondaryActions}>
+                    {isNotStarted && (
+                        <Button text="Iniciar"
+                            color={colors.primary}
+                            variant="outlined"
+                            icon={<Ionicons name="play-outline" size={18} color={colors.primary} />}
+                            textStyle={styles.actionText}
+                            style={styles.secondaryAction}
+                            onPress={handleStart}
+                        />
+                    )}
+                    <Button text={isNotStarted ? "Editar" : "Editar atividade"}
+                        color={colors.text.secondary}
+                        variant="outlined"
+                        icon={<Ionicons name="create-outline" size={18} color={colors.text.secondary} />}
+                        textStyle={styles.actionText}
+                        style={styles.secondaryAction}
+                        onPress={handleEdit}
+                    />
+                </View>
             </View>
         </SafeAreaView>
     );

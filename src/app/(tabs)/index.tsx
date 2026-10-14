@@ -8,6 +8,7 @@ import { Activity, ActivityDetail } from "@/data/activities";
 import { summary } from "@/data/summary";
 import { styles } from "@/screens/Home/styles";
 import { colors } from "@/styles/colors";
+import { isPending } from "@/utils/activityStatus";
 import { daysUntil, parseIsoDate } from "@/utils/date";
 import { FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
@@ -18,28 +19,38 @@ const SUMMARY_ICON_SIZE = 20;
 const HOME_ACTIVITIES_LIMIT = 2;
 const HOME_DISCIPLINES_LIMIT = 2;
 
+function getBadge(activity: ActivityDetail, days: number) {
+    if (activity.status === "late") {
+        return "Atrasada";
+    }
+    if (activity.status === "inProgress") {
+        return "Em andamento";
+    }
+    return days === 0 ? "Para hoje" : `Em ${days} ${days === 1 ? "dia" : "dias"}`;
+}
+
 // Converte a atividade do banco para o formato resumido do card da Home.
 function toUpcomingActivity(activity: ActivityDetail): Activity {
     const days = daysUntil(parseIsoDate(activity.dueDate));
-    const isWarning = activity.status === "urgent" || days <= 0;
+    const isWarning = activity.status === "urgent" || activity.status === "late";
 
     return {
         id: activity.id,
         title: activity.title,
         discipline: activity.discipline,
-        badge: isWarning ? "Pendente" : `Em ${days} ${days === 1 ? "dia" : "dias"}`,
+        badge: getBadge(activity, days),
         dueLabel: activity.dueLabel,
         tone: isWarning ? "warning" : "neutral",
     };
 }
 
 export default function Index() {
-    const { activities, pendingCount } = useActivities();
+    const { activities, weekCount } = useActivities();
     const { disciplines } = useDisciplines();
 
     // A lista já vem do banco ordenada pela data de entrega.
     const upcomingActivities = activities
-        .filter((activity) => activity.status !== "done")
+        .filter(isPending)
         .slice(0, HOME_ACTIVITIES_LIMIT)
         .map(toUpcomingActivity);
 
@@ -56,7 +67,7 @@ export default function Index() {
                 </View>
 
                 <View style={styles.summary}>
-                    <SummaryCard total={pendingCount}
+                    <SummaryCard total={weekCount}
                         title="Pendências"
                         subtitle="Para esta semana"
                         textColor={colors.orange}
@@ -66,6 +77,7 @@ export default function Index() {
                                 color={colors.orange}
                                 size={SUMMARY_ICON_SIZE} />
                         }
+                        onPress={() => router.navigate({ pathname: "/activity", params: { filter: "week" } })}
                     />
 
                     <View style={styles.cardContent}>
@@ -95,6 +107,7 @@ export default function Index() {
                                         color={colors.primary}
                                         size={SUMMARY_ICON_SIZE} />
                                 }
+                                onPress={() => router.navigate("/discipline")}
                             />
                         </View>
                     </View>

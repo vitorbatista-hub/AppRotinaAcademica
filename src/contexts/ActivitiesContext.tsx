@@ -1,4 +1,5 @@
-import { ActivityDetail, ActivityPriority, ActivityStatus } from "@/data/activities";
+import { ActivityDetail, ActivityPriority, StoredActivityStatus } from "@/data/activities";
+import { getActivityStatus, isDueThisWeek, isPending } from "@/utils/activityStatus";
 import { formatDueLabel, parseIsoDate } from "@/utils/date";
 import { useSQLiteContext } from "expo-sqlite";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
@@ -19,27 +20,22 @@ type ActivityRow = {
     discipline: string;
     icon: ActivityDetail["icon"];
     dueDate: string;
-    status: ActivityStatus;
+    status: StoredActivityStatus;
     priority: ActivityPriority;
 };
 
 type ActivitiesContextData = {
     activities: ActivityDetail[];
     pendingCount: number;
+    weekCount: number;
     completedCount: number;
     addActivity: (activity: ActivityInput) => Promise<void>;
     updateActivity: (id: string, activity: ActivityInput) => Promise<void>;
     deleteActivity: (id: string) => Promise<void>;
+    startActivity: (id: string) => Promise<void>;
     completeActivity: (id: string) => Promise<void>;
+    reopenActivity: (id: string) => Promise<void>;
 };
-
-// Mesmos status do filtro "Pendentes" da tela de atividades e do pendingCount das disciplinas.
-const PENDING_STATUSES: ActivityStatus[] = ["urgent", "upcoming"];
-
-// Regra provisória até a Fase 2: alta prioridade entra como urgente.
-function getInitialStatus(priority: ActivityPriority): ActivityStatus {
-    return priority === "high" ? "urgent" : "upcoming";
-}
 
 const ActivitiesContext = createContext<ActivitiesContextData | null>(null);
 
@@ -60,6 +56,7 @@ export function ActivitiesProvider({ children }: { children: ReactNode }) {
         return rows.map((row) => ({
             ...row,
             id: String(row.id),
+            status: getActivityStatus(row.status, row.dueDate),
             dueLabel: formatDueLabel(parseIsoDate(row.dueDate)),
         }));
     }, [db]);
@@ -71,30 +68,27 @@ export function ActivitiesProvider({ children }: { children: ReactNode }) {
     async function addActivity(activity: ActivityInput) {
         await db.runAsync(
             `INSERT INTO activities (title, description, discipline_id, due_date, status, priority)
-             VALUES (?, ?, ?, ?, ?, ?)`,
+             VALUES (?, ?, ?, ?, 'upcoming', ?)`,
             activity.title,
             activity.description,
             activity.disciplineId,
             activity.dueDate,
-            getInitialStatus(activity.priority),
             activity.priority
         );
         setActivities(await fetchActivities());
     }
 
     async function updateActivity(id: string, activity: ActivityInput) {
-        // Em andamento e concluída continuam como estão; as pendentes seguem a prioridade nova.
+        // O status não muda na edição; urgente e atrasada são recalculadas pela data nova.
         await db.runAsync(
             `UPDATE activities
-             SET title = ?, description = ?, discipline_id = ?, due_date = ?, priority = ?,
-                 status = CASE WHEN status IN ('urgent', 'upcoming') THEN ? ELSE status END
+             SET title = ?, description = ?, discipline_id = ?, due_date = ?, priority = ?
              WHERE id = ?`,
             activity.title,
             activity.description,
             activity.disciplineId,
             activity.dueDate,
             activity.priority,
-            getInitialStatus(activity.priority),
             id
         );
         setActivities(await fetchActivities());
@@ -105,28 +99,37 @@ export function ActivitiesProvider({ children }: { children: ReactNode }) {
         setActivities(await fetchActivities());
     }
 
-    async function completeActivity(id: string) {
-        await db.runAsync("UPDATE activities SET status = 'done' WHERE id = ?", id);
+    async function setStatus(id: string, status: StoredActivityStatus) {
+        await db.runAsync("UPDATE activities SET status = ? WHERE id = ?", status, id);
         setActivities(await fetchActivities());
     }
+
+    const startActivity = (id: string) => setStatus(id, "inProgress");
+    const completeActivity = (id: string) => setStatus(id, "done");
+    // Volta para "não iniciada"; a data decide se ela aparece como próxima, urgente ou atrasada.
+    const reopenActivity = (id: string) => setStatus(id, "upcoming");
 
     // Segura as telas até a primeira leitura do banco, para não piscar a lista vazia.
     if (!activities) {
         return null;
     }
 
-    const pendingCount = activities.filter((activity) => PENDING_STATUSES.includes(activity.status)).length;
+    const pendingCount = activities.filter(isPending).length;
+    const weekCount = activities.filter((activity) => isDueThisWeek(activity)).length;
     const completedCount = activities.filter((activity) => activity.status === "done").length;
 
     return (
         <ActivitiesContext.Provider value={{
             activities,
             pendingCount,
+            weekCount,
             completedCount,
             addActivity,
             updateActivity,
             deleteActivity,
+            startActivity,
             completeActivity,
+            reopenActivity,
         }}>
             {children}
         </ActivitiesContext.Provider>

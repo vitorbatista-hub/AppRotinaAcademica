@@ -88,6 +88,15 @@ export const styles = StyleSheet.create({
         textTransform: "uppercase",
     },
 
+    secondaryActions: {
+        flexDirection: "row",
+        gap: 12,
+    },
+
+    secondaryAction: {
+        flex: 1,
+    },
+
     completeButton: {
         boxShadow: shadows.card,
     },

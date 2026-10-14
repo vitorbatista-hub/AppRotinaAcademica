@@ -18,6 +18,13 @@ type StatusStyle = {
 };
 
 const STATUS_STYLES: Record<ActivityStatus, StatusStyle> = {
+    late: {
+        label: "Atrasada",
+        icon: "alert-circle",
+        accentColor: colors.red,
+        badgeColor: colors.background.error,
+        textColor: colors.text.error,
+    },
     urgent: {
         label: "Urgente",
         icon: "warning",

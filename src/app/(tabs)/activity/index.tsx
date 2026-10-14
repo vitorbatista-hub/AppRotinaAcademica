@@ -3,33 +3,36 @@ import { FilterChip } from "@/components/FilterChip";
 import { Header } from "@/components/Header";
 import { NewActivityCard } from "@/components/NewActivityCard";
 import { useActivities } from "@/contexts/ActivitiesContext";
-import { ActivityStatus } from "@/data/activities";
+import { ActivityDetail } from "@/data/activities";
 import { summary } from "@/data/summary";
 import { styles } from "@/screens/Activity/styles";
-import { router } from "expo-router";
-import { useState } from "react";
+import { isDueThisWeek, NOT_STARTED_STATUSES } from "@/utils/activityStatus";
+import { router, useLocalSearchParams } from "expo-router";
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type Filter = {
+    // Valor usado no link, ex.: /activity?filter=week (card "Pendências" da Home).
+    key: string;
     label: string;
-    statuses: ActivityStatus[];
+    matches: (activity: ActivityDetail) => boolean;
 };
 
 const FILTERS: Filter[] = [
-    { label: "Todas", statuses: ["urgent", "upcoming", "inProgress", "done"] },
-    { label: "Pendentes", statuses: ["urgent", "upcoming"] },
-    { label: "Em andamento", statuses: ["inProgress"] },
-    { label: "Concluídas", statuses: ["done"] },
+    { key: "all", label: "Todas", matches: () => true },
+    { key: "week", label: "Esta semana", matches: (activity) => isDueThisWeek(activity) },
+    { key: "notStarted", label: "Não iniciadas", matches: (activity) => NOT_STARTED_STATUSES.includes(activity.status) },
+    { key: "inProgress", label: "Em andamento", matches: (activity) => activity.status === "inProgress" },
+    { key: "done", label: "Concluídas", matches: (activity) => activity.status === "done" },
 ];
 
 export default function Activity() {
     const { activities } = useActivities();
-    const [filter, setFilter] = useState(FILTERS[0]);
+    // O filtro fica no parâmetro da rota, assim a Home consegue abrir a aba já filtrada.
+    const { filter: filterParam } = useLocalSearchParams<{ filter?: string }>();
+    const filter = FILTERS.find((item) => item.key === filterParam) ?? FILTERS[0];
 
-    const filteredActivities = activities.filter((activity) =>
-        filter.statuses.includes(activity.status)
-    );
+    const filteredActivities = activities.filter(filter.matches);
 
     return (
         <SafeAreaView style={styles.container} edges={["top"]}>
@@ -51,10 +54,10 @@ export default function Activity() {
                     showsHorizontalScrollIndicator={false}
                 >
                     {FILTERS.map((item) => (
-                        <FilterChip key={item.label}
+                        <FilterChip key={item.key}
                             label={item.label}
                             selected={item === filter}
-                            onPress={() => setFilter(item)}
+                            onPress={() => router.setParams({ filter: item.key })}
                         />
                     ))}
                 </ScrollView>

@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { styles } from "./styles";
 
 type SummaryCardProps = {
@@ -10,6 +10,7 @@ type SummaryCardProps = {
     textColor: string;
     accentColor: string;
     accentOpacity?: number;
+    onPress?: () => void;
 };
 
 export function SummaryCard({
@@ -20,9 +21,17 @@ export function SummaryCard({
     textColor,
     accentColor,
     accentOpacity = 0.2,
+    onPress,
 }: SummaryCardProps) {
+    // Sem onPress o card continua só informativo, sem efeito de toque.
     return (
-        <View style={styles.container}>
+        <TouchableOpacity activeOpacity={0.7}
+            style={styles.container}
+            onPress={onPress}
+            disabled={!onPress}
+            accessibilityRole={onPress ? "button" : undefined}
+            accessibilityLabel={`${total} ${title}, ${subtitle}`}
+        >
             <View style={[styles.accent, { backgroundColor: accentColor, opacity: accentOpacity }]} />
 
             <View style={styles.row}>
@@ -34,6 +43,6 @@ export function SummaryCard({
                 <Text style={styles.titleContent}>{title}</Text>
                 <Text style={styles.subtitle}>{subtitle}</Text>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 }
